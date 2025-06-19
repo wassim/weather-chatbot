@@ -11,7 +11,7 @@ parameters:
 
     ignoreErrors:
 #        - identifier: missingType.generics
-#        - identifier: missingType.iterableValue
+        - identifier: missingType.iterableValue
 #
 #    excludePaths:
 #        - ./*/*/FileToBeExcluded.php
