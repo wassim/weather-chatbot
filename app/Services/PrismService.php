@@ -36,6 +36,11 @@ class PrismService
             ->withStringParameter('city', 'The city to get weather for')
             ->using(function (string $city): string {
                 $coords = $this->openMeteoService->getCoordinates($city);
+
+                if ($coords === null) {
+                    throw new \Exception("Could not find coordinates for city: {$city}");
+                }
+
                 $data = $this->openMeteoService->getCurrentWeather($coords['latitude'], $coords['longitude']);
 
                 return (string) json_encode($data);

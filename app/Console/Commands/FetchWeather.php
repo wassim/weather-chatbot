@@ -107,7 +107,7 @@ class FetchWeather extends Command
             $this->newLine();
             $this->line("🤖 <fg=cyan>{$response}</>");
         } catch (\Exception $e) {
-            $this->error('Error: '.$e->getMessage());
+            $this->error('❌ There was an error processing your request.');
         }
     }
 
