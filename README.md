@@ -1,61 +1,254 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Weather Chatbot
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+An intelligent weather chatbot built with Laravel that provides real-time weather information through natural conversation. The bot uses AI (OpenAI) to understand user queries and fetches current weather data from the Open-Meteo API.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+-   🤖 **AI-Powered Conversations**: Natural language interaction using OpenAI GPT-4o-mini
+-   🌤️ **Real-Time Weather Data**: Current weather conditions from Open-Meteo API
+-   💬 **Conversation Memory**: Maintains chat history across sessions
+-   🌍 **Global Coverage**: Weather data for cities worldwide
+-   📝 **Session Management**: Multiple conversation sessions with history
+-   🎯 **Context Awareness**: Remembers recently mentioned cities in conversation
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Requirements
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+-   **PHP 8.2** or higher
+-   **Composer** for PHP dependencies
+-   **Node.js 18+** and **npm** for frontend assets
+-   **SQLite** database (default) or MySQL/PostgreSQL
+-   **OpenAI API Key** for AI functionality
 
-## Learning Laravel
+## Installation
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 1. Clone and Install Dependencies
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```bash
+# Clone the repository
+git clone <repository-url> weather-chatbot
+cd weather-chatbot
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+# Install PHP dependencies
+composer install
+```
 
-## Laravel Sponsors
+### 2. Environment Configuration
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+# Copy environment file
+cp .env.example .env
 
-### Premium Partners
+# Generate application key
+php artisan key:generate
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+# Create SQLite database file
+touch database/database.sqlite
+```
 
-## Contributing
+### 3. Configure Environment Variables
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Edit `.env` file and add your OpenAI API key:
 
-## Code of Conduct
+```env
+# Required: OpenAI API Configuration
+OPENAI_API_KEY=your_openai_api_key_here
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# Database (SQLite is default, no changes needed)
+DB_CONNECTION=sqlite
+```
 
-## Security Vulnerabilities
+### 4. Database Setup
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+# Run database migrations
+php artisan migrate
+```
 
-## License
+## Usage
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Interactive Chat Mode (Default)
+
+Start a conversation with the weather bot:
+
+```bash
+# Start chatbot in interactive mode
+php artisan app:fetch-weather
+
+# Or use the Makefile shortcut
+make weather
+```
+
+This starts an interactive session where you can:
+
+-   Ask about weather in any city
+-   Get contextual responses that remember previous cities mentioned
+-   Type `quit`, `exit`, or `bye` to end the conversation
+-   Type `history` to view conversation history
+-   Type `clear` to clear conversation history
+
+### Example Conversation
+
+```
+🤖 Weather Chatbot (Session: default)
+Type your weather questions. Type 'quit', 'exit', or 'bye' to end the conversation.
+
+You: What's the weather like in Paris?
+🤔 Thinking...
+
+🤖 The current weather in Paris is partly cloudy with a temperature of 18°C (64°F).
+    The humidity is at 65% and there's a light wind of 12 km/h from the northwest.
+
+You: How about tomorrow?
+🤔 Thinking...
+
+🤖 I can only provide current weather conditions. For tomorrow's forecast in Paris,
+    you might want to check a dedicated weather forecasting service.
+
+You: What about London?
+🤔 Thinking...
+
+🤖 In London right now, it's overcast with 15°C (59°F)...
+```
+
+### Session Management
+
+```bash
+# Use a specific session ID
+php artisan app:fetch-weather --session=user123
+
+# View conversation history
+php artisan app:fetch-weather --history --session=user123
+
+# Clear conversation history
+php artisan app:fetch-weather --clear --session=user123
+```
+
+## Development
+
+### Available Commands
+
+```bash
+# Start the weather chatbot
+make weather
+
+# Run tests
+make test
+php artisan test
+
+# Code quality checks
+make pint          # Code formatting
+make stan          # Static analysis
+make security      # Security audit
+
+# Database operations
+php artisan migrate:fresh    # Reset database
+php artisan migrate         # Run migrations
+```
+
+### Testing
+
+```bash
+# Run all tests
+make test
+php artisan test
+
+# Run specific test file
+php artisan test tests/Feature/FetchWeatherCommandTest.php
+
+# Run with coverage
+php artisan test --coverage
+```
+
+## API Integration
+
+### Weather Data Source
+
+-   **Open-Meteo API**: Provides current weather conditions
+-   **Geocoding**: Automatically converts city names to coordinates
+-   **No API key required** for weather data
+
+### AI Integration
+
+-   **Prism PHP**: Laravel package for AI integration
+-   **OpenAI GPT-4o-mini**: Powers natural language understanding
+-   **Function calling**: AI can trigger weather data fetching when needed
+
+## Architecture
+
+### Core Services
+
+-   **`OpenMeteoService`**: Handles weather API integration and geocoding
+-   **`PrismService`**: Manages AI conversations and tool integration
+-   **`FetchWeather`** Command: CLI interface for the chatbot
+-   **`Conversation`** Model: Stores chat history with session management
+
+### Database Schema
+
+**Conversations Table:**
+
+-   `session_id`: Groups messages by conversation session
+-   `role`: Message type (system/user/assistant)
+-   `content`: Message content
+-   `metadata`: Additional data (JSON)
+-   `timestamps`: Message timing
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Missing OpenAI API Key**
+
+    ```
+    Error: No API key provided
+    Solution: Add OPENAI_API_KEY to your .env file
+    ```
+
+2. **Database Connection Issues**
+
+    ```
+    Error: Database file not found
+    Solution: Ensure database/database.sqlite exists and run migrations
+    ```
+
+3. **Weather API Errors**
+    ```
+    Error: Could not find coordinates for city
+    Solution: Check city name spelling or try a different city
+    ```
+
+### Getting Help
+
+-   Check the logs: `storage/logs/laravel.log`
+-   Run tests to verify setup: `php artisan test`
+-   Ensure all environment variables are set correctly
+
+## What I didn't build (on purpose):
+
+-   No web interface - kept it CLI only for this assessment
+-   No weather forecasts - just current conditions
+-   No user accounts - simple session IDs instead
+-   No caching - shows direct API integration
+-   No auto location detection - users type city names
+
+## Next steps:
+
+-   Add caching (AI prompts + weather data) to reduce costs
+-   Build a web interface
+-   Add weather forecasts
+-   Implement proper user auth
+-   Add location detection via browser/IP
+
+## Where to extend:
+
+-   `app/Services/PrismService.php` - add prompt caching
+-   `app/Services/OpenMeteoService.php` - add weather caching
+-   `routes/web.php` - add web routes
+-   `app/Http/Controllers/` - create web controllers
+-   `resources/views/` - build frontend templates
+
+## Design notes/caveats:
+
+-   Can't detect user location (CLI app, no browser)
+-   Used simple session IDs instead of real auth
+-   No caching to keep it simple for assessment
+-   Basic error handling only
