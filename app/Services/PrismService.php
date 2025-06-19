@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Conversation;
 use Prism\Prism\Enums\Provider;
+use Prism\Prism\Enums\ToolChoice;
 use Prism\Prism\Facades\Tool;
 use Prism\Prism\Prism;
 use Prism\Prism\ValueObjects\Messages\AssistantMessage;
@@ -45,6 +46,7 @@ class PrismService
             ->withMessages($messages)
             ->withMaxSteps(2)
             ->withTools([$weatherTool])
+            ->withToolChoice(ToolChoice::Auto)
             ->asText();
 
         // Store the assistant response
@@ -61,7 +63,15 @@ class PrismService
         $messages = [];
 
         // Add system message for context
-        $messages[] = new SystemMessage('You are a helpful weather assistant. Provide current weather information for any city using the weather tool. Be conversational and remember the context of previous exchanges. Use the last known location from previous messages as the default location. Do no answer or give assistance with anything else than the weather information.');
+        $systemPrompt = 'You are a helpful weather assistant. Provide current weather information in human readable format for any city using the weather tool. Be conversational and remember the context of previous exchanges.
+
+IMPORTANT CONTEXT RULES:
+1. If someone asks "What\'s the weather?" or similar without specifying a city, look at the conversation history for the most recently mentioned city and use that.
+2. If you find a recent city in our conversation, use it as the default.
+3. Only ask for a city if no city has been mentioned in recent conversation history.
+4. Do NOT answer questions about anything other than weather information.';
+
+        $messages[] = new SystemMessage($systemPrompt);
 
         // Convert stored history to message objects
         foreach ($history as $message) {
