@@ -1,0 +1,66 @@
+name: Tests
+
+on: [push]
+
+jobs:
+  php-tests:
+    name: Run PHP tests
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: mysql_db
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+
+      - name: Run Security Checker
+        run: |
+          curl -L -sS -o local-php-security-checker $(curl -s https://api.github.com/repos/fabpot/local-php-security-checker/releases/latest | jq -r '.assets[].browser_download_url | select(.|test("_linux_amd64$"))')
+          chmod +x ./local-php-security-checker
+          ./local-php-security-checker
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+
+      - name: Install Composer dependencies
+        run: |
+          php --version
+          composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
+
+      - name: Copy .env
+        run: |
+          cp .env.ci .env
+          php artisan key:generate
+          php artisan --version
+
+      - name: Analyze code with Larastan
+        run: make stan
+
+      - name: Migrate database
+        run: |
+          mysql --version
+          php artisan migrate:fresh --seed
+        env:
+          DB_PORT: ${{ job.services.mysql.ports[3306] }}
+
+      - name: Execute PHP tests
+        run: |
+          php artisan serve &
+          php artisan test
+        env:
+          DB_PORT: ${{ job.services.mysql.ports[3306] }}
